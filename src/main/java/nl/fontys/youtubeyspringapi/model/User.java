@@ -17,8 +17,11 @@ public class User {
     @NotBlank
     @Size(max = 20)
     private String username;
-
+    @NotBlank
+    @Size(max = 20)
     private String password;
+    @NotBlank
+    @Size(max = 20)
     private String email;
     private String description;
 
