@@ -1,60 +1,59 @@
 package nl.fontys.youtubeyspringapi.controllers;
 
-import nl.fontys.youtubeyspringapi.DTO.UserDTO;
+import nl.fontys.youtubeyspringapi.config.JwtGeneratorInterface;
 import nl.fontys.youtubeyspringapi.document.User;
+import nl.fontys.youtubeyspringapi.exception.UserNotFoundException;
 import nl.fontys.youtubeyspringapi.services.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
-@RequestMapping("/users")
 public class UserController {
     private UserService userService;
+    private JwtGeneratorInterface jwtGenerator;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    @Autowired
+    public UserController(UserService userService, JwtGeneratorInterface jwtGenerator){
+        this.userService=userService;
+        this.jwtGenerator=jwtGenerator;
     }
 
-    //create a new user
-    @PostMapping("")
-    public ResponseEntity createUser(@RequestBody User newUser) {
-        try {
-            User createdUser = userService.createUser(newUser);
-            return ResponseEntity.ok().body("Successfully created a new account!");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+    @PostMapping("/register")
+    public ResponseEntity<?> postUser(@RequestBody User user){
+        try{
+            if(user.getUserName() == null || user.getPassword() == null) {
+                throw new UserNotFoundException("UserName or Password is Empty");
+            }
+            if(userService.getUserByNameAndPassword(user.getUserName(), user.getPassword()) != null){
+                throw new UserNotFoundException("UserName already exists");
+            }
+            userService.saveUser(user);
+            return new ResponseEntity<>(user, HttpStatus.CREATED);
+        } catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
-    //get a user by id
-    @GetMapping("{id}")
-    public ResponseEntity getUserById(@PathVariable("id") String id) {
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody User user) {
         try {
-            User user = userService.getUserById(id);
-            UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getDescription());
-            return ResponseEntity.ok().body(userDTO);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PatchMapping("{id}")
-    public ResponseEntity updateUser(@PathVariable("id") String id, @RequestBody UserDTO userDTO) {
-        try {
-            User updatedUser = userService.updateUser(id, userDTO);
-            return ResponseEntity.ok().body("User updated successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity deleteUser(@PathVariable("id") String id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.ok().body("User deleted successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            if(user.getUserName() == null || user.getPassword() == null) {
+                throw new UserNotFoundException("UserName or Password is Empty");
+            }
+            User userData = userService.getUserByNameAndPassword(user.getUserName(), user.getPassword());
+            if(userData == null){
+                throw new UserNotFoundException("UserName or Password is Invalid");
+            }
+            return new ResponseEntity<>(jwtGenerator.generateToken(user), HttpStatus.OK);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
 }

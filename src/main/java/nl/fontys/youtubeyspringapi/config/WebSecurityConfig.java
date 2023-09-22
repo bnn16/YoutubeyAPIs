@@ -1,35 +1,24 @@
 package nl.fontys.youtubeyspringapi.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.fontys.youtubeyspringapi.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
-    @Autowired
-    UserService userDetailsService;
-
-
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		UserDetailsService userDetailsService = mongoUserDetails();
-		auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
-
-	}
-
+public class WebSecurityConfig {
+    @Bean
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests(authorizeRequests ->
+                        authorizeRequests
+                                .requestMatchers("/login", "/register", "/").permitAll()
+                                .requestMatchers("/api/requests/edits/**").authenticated()
+                )
+                .csrf(csrf -> csrf.disable()); // Disable CSRF for simplicity (you may want to enable it in a production environment)
+                 // Disable frame options for H2 Console (if used)
+        return http.build();
+    }
 }

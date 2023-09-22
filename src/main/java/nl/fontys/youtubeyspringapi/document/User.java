@@ -9,62 +9,25 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Data
 @Document(collection= "users")
-public class User implements UserDetails {
+public class User {
 
-    @Id private String id;
-    @NotNull
+    @Id
+    private String id;
     @Indexed(unique = true)
-    private String username;
-    @NotNull
-    @Size(max = 20)
-    @JsonIgnore
+    private String userName;
     private String password;
-    @NotNull
-    @Indexed(unique = true)
+    private String role;
     private String email;
-    private boolean enabled;
-    @DBRef
-    private Set<Role> roles;
-
-
-    //hash the password
-    public void setPassword(String password){
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        this.password = passwordEncoder.encode(password);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
-    //TODO: find out if youtube api auth needs to be put in here.
 }
