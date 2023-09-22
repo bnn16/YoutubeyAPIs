@@ -1,67 +1,75 @@
 package nl.fontys.youtubeyspringapi.services;
 
-import nl.fontys.youtubeyspringapi.DTO.UserDTO;
-import nl.fontys.youtubeyspringapi.model.User;
+import nl.fontys.youtubeyspringapi.document.Role;
+import nl.fontys.youtubeyspringapi.document.User;
+import nl.fontys.youtubeyspringapi.repositories.RoleRepository;
 import nl.fontys.youtubeyspringapi.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
-import java.util.Optional;
+import java.util.*;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
+    @Autowired
     private UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+
+
+
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
-    public User createUser(User newUser) {
-        User existingUser = userRepository.findByUsername(newUser.getUsername());
-        if (existingUser != null) {
-            throw new RuntimeException("Username already exists");
+
+    public void saveUser(User user) {
+        user.setPassword(user.getPassword());
+        user.setEnabled(true);
+        Role userRole = roleRepository.findByRole("ADMIN");
+        user.setRoles(new HashSet<>(Arrays.asList(userRole)));
+        userRepository.save(user);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+        User user = userRepository.findByEmail(email);
+        if(user != null) {
+            List<GrantedAuthority> authorities = getUserAuthority(user.getRoles());
+            return buildUserForAuthentication(user, authorities);
+        } else {
+            throw new UsernameNotFoundException("username not found");
         }
-         newUser.setPassword(newUser.getPassword());
-        return userRepository.save(newUser);
     }
 
-    public User getUserById(String id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (!optionalUser.isPresent()) {
+    private List<GrantedAuthority> getUserAuthority(Set<Role> userRoles) {
+        Set<GrantedAuthority> roles = new HashSet<>();
+        userRoles.forEach((role) -> {
+            roles.add(new SimpleGrantedAuthority(role.getRole()));
+        });
+
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>(roles);
+        return grantedAuthorities;
+    }
+
+    public User findById(String id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
             throw new RuntimeException("User not found");
         }
-
-        return optionalUser.get();
+        return user.get();
     }
 
-    public User updateUser(String id, UserDTO userDTO) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (!optionalUser.isPresent()) {
-            throw new RuntimeException("User not found");
-        }
+    private UserDetails buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
+    return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+}
 
-        User existingUser = optionalUser.get();
-
-        if (userDTO.getUsername() != null) {
-            existingUser.setUsername(userDTO.getUsername());
-        }
-        if (userDTO.getEmail() != null) {
-            existingUser.setEmail(userDTO.getEmail());
-        }
-        if (userDTO.getDescription() != null) {
-            existingUser.setDescription(userDTO.getDescription());
-        }
-
-        return userRepository.save(existingUser);
-    }
-
-    public void deleteUser(String id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (!optionalUser.isPresent()) {
-            throw new RuntimeException("User not found");
-        }
-
-        User existingUser = optionalUser.get();
-        userRepository.delete(existingUser);
-    }
 }

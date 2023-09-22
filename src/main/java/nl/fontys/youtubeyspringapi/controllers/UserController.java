@@ -1,7 +1,7 @@
 package nl.fontys.youtubeyspringapi.controllers;
 
 import nl.fontys.youtubeyspringapi.DTO.UserDTO;
-import nl.fontys.youtubeyspringapi.model.User;
+import nl.fontys.youtubeyspringapi.document.User;
 import nl.fontys.youtubeyspringapi.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
