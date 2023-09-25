@@ -35,6 +35,14 @@ dependencies {
     // Spring Security Test
     testImplementation 'org.springframework.security:spring-security-test'
 
+
+    //JUnit for testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+
+    // Mockito for mocking
+    testImplementation 'org.mockito:mockito-core:3.12.4'
+
     // JSON Web Token (JWT) Dependencies
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
