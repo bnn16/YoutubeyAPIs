@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class PostServiceImpl implements PostService{
+public class PostServiceImpl implements PostService {
 
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
     @Autowired
     public PostServiceImpl(PostRepository postRepository) {
@@ -20,21 +20,19 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public void savePost(Post post) {
-        if(getPostById(post.getId()).isPresent()){
-            throw new IllegalArgumentException("Post already exists");
-        };
         postRepository.save(post);
     }
 
+
     @Override
     public List<Post> getPostByUserId(String userId) {
-        return postRepository.findAllByUserId(userId);
+        return postRepository.findByUserId(userId);
     }
 
     @Override
     public Optional<Post> getPostById(String id) {
         Optional<Post> post = postRepository.findById(id);
-        if(post.isPresent()){
+        if (post.isPresent()) {
             return post;
         }
         throw new IllegalArgumentException("Post does not exist");
@@ -42,17 +40,15 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public void deletePostById(String id) {
-        if(getPostById(id).isEmpty()){
+        if (getPostById(id).isEmpty()) {
             throw new IllegalArgumentException("Post does not exist");
-        }
-        else {
+        } else {
             postRepository.deleteById(id);
         }
     }
 
     @Override
-    public void updatePostById(String id,Post updatedPost) {
-        // Check if the post with the given ID exists
+    public void updatePostById(String id, Post updatedPost) {
         if (!postRepository.existsById(id)) {
             throw new IllegalArgumentException("Post with ID " + id + " does not exist");
         }
@@ -61,9 +57,18 @@ public class PostServiceImpl implements PostService{
         Post existingPost = postRepository.findById(id).orElse(null);
 
         if (existingPost != null) {
-            existingPost.setTitle(updatedPost.getTitle());
-            existingPost.setDescription(updatedPost.getDescription());
-            existingPost.setStatus(updatedPost.getStatus());
+            if (updatedPost.getTitle() != null) {
+                existingPost.setTitle(updatedPost.getTitle());
+            }
+
+            if (updatedPost.getDescription() != null) {
+                existingPost.setDescription(updatedPost.getDescription());
+            }
+
+            if (updatedPost.getStatus() != null) {
+                existingPost.setStatus(updatedPost.getStatus());
+            }
+
             postRepository.save(existingPost);
         }
     }

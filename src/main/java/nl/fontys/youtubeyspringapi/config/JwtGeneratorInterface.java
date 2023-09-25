@@ -1,10 +1,18 @@
 package nl.fontys.youtubeyspringapi.config;
 
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import nl.fontys.youtubeyspringapi.document.User;
 
-import java.util.Map;
+import javax.naming.AuthenticationException;
 
 public interface JwtGeneratorInterface {
 
-    Map<String, String> generateToken(User user);
+    String createToken(User user);
+
+    Claims resolveClaims(HttpServletRequest req);
+
+    String resolveToken(HttpServletRequest request);
+
+    boolean validateClaims(Claims claims) throws AuthenticationException;
 }
