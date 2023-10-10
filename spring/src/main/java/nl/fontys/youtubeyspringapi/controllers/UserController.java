@@ -2,11 +2,13 @@ package nl.fontys.youtubeyspringapi.controllers;
 
 import nl.fontys.youtubeyspringapi.config.JwtGeneratorInterface;
 import nl.fontys.youtubeyspringapi.document.User;
+import nl.fontys.youtubeyspringapi.document.UserInformation;
 import nl.fontys.youtubeyspringapi.document.requests.LoginReq;
 import nl.fontys.youtubeyspringapi.document.responds.ErrorRes;
 import nl.fontys.youtubeyspringapi.document.responds.LoginRes;
 import nl.fontys.youtubeyspringapi.exception.UserNotFoundException;
 import nl.fontys.youtubeyspringapi.services.CustomUserDetailsService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -76,4 +75,41 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
+
+    @GetMapping("/profile/{id}")
+    public ResponseEntity getUserDetails(@PathVariable String id) {
+        try {
+            UserInformation userInformation = userService.findByUserId(id);
+            if(userInformation == null){
+                throw new UserNotFoundException("User not found");
+            }
+            else{
+                return ResponseEntity.ok(userInformation);
+            }
+        } catch (Exception e) {
+            ErrorRes errorResponse = new ErrorRes(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+    @PostMapping("/profile/{id}")
+    public ResponseEntity postUserDetails(@PathVariable String id, @RequestBody UserInformation userInformation) {
+        try {
+            userService.saveUserInfo(userInformation);
+            return ResponseEntity.ok(userService.findById(id));
+        } catch (Exception e) {
+            ErrorRes errorResponse = new ErrorRes(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+    @PatchMapping("/profile/{id}")
+    public ResponseEntity editUserDetails(@PathVariable String id, @RequestBody UserInformation userInformation) {
+        try {
+            userService.editById(id, userInformation);
+            return ResponseEntity.ok(userService.findById(id));
+        } catch (Exception e) {
+            ErrorRes errorResponse = new ErrorRes(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
 }
