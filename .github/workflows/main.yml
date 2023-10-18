@@ -26,7 +26,7 @@ jobs:
       run: cd spring
 
     - name: Build with Gradle
-      run: ./gradlew build
+      run: gradlew build
 
     - name: Test with Gradle
-      run: ./gradlew test --tests "nl.fontys.youtubeyspringapi.*"
+      run: gradlew test --tests "nl.fontys.youtubeyspringapi.*"
