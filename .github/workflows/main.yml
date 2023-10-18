@@ -24,8 +24,13 @@ jobs:
 
     - name: Set the working directory to the Spring project
       run: cd spring
+
+
     - name: List directory contents
       run: ls -l
+
+    - name: Set the working directory to the Spring project
+      run: cd spring
 
     - name: Make gradlew executable
       run: chmod +x gradlew
