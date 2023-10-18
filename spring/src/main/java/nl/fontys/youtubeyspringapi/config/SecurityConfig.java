@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/rest/auth/**").permitAll()
+                        .requestMatchers("/rest/auth/login", "/rest/auth/register").permitAll().requestMatchers("/rest/auth/profile/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(JwtFilter, UsernamePasswordAuthenticationFilter.class)

@@ -50,7 +50,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public UserInformation findByUserId(String id) {
-        return UserInfoRepository.findByUserId(id);
+            return UserInfoRepository.findByUserId(id);
     }
 
     public Optional<UserInformation> findById(String id) {
