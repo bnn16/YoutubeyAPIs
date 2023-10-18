@@ -25,8 +25,11 @@ jobs:
     - name: Set the working directory to the Spring project
       run: cd spring
 
+    - name: Make gradlew executable
+      run: chmod +x gradlew
+
     - name: Build with Gradle
-      run: gradlew build
+      run: ./gradlew build
 
     - name: Test with Gradle
-      run: gradlew test --tests "nl.fontys.youtubeyspringapi.*"
+      run: ./gradlew test --tests "nl.fontys.youtubeyspringapi.*"
