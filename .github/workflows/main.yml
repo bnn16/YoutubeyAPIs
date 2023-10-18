@@ -22,8 +22,11 @@ jobs:
         java-package: 'jdk'
         architecture: 'x64'
 
+    - name: Set the working directory to the Spring project
+      run: cd YoutubeyAPIs/spring
+
     - name: Build with Gradle
-      run: ./YoutubeyAPIs/spring/gradlew build
+      run: ./gradlew build
 
     - name: Test with Gradle
-      run: ./YoutubeyAPIs/spring/gradlew test --tests "nl.fontys.youtubeyspringapi.*"
+      run: ./gradlew test --tests "nl.fontys.youtubeyspringapi.*"
