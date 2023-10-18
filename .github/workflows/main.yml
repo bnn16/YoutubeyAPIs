@@ -1,0 +1,34 @@
+name: Java Spring Gradle CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+        java-package: 'jdk'
+        architecture: 'x64'
+
+    - name: List directory contents
+      run: ls -l
+
+    - name: Build with Gradle
+      run: ./gradlew build
+      working-directory: ./spring
+
+    - name: Test with Gradle
+      run: ./gradlew test
+      working-directory: ./spring
