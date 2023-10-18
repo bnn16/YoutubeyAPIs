@@ -18,6 +18,8 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '17'
+        java-package: 'jdk'  # Specify the package here
+        architecture: 'x64'
 
     - name: Build with Gradle
       run: ./gradlew build
