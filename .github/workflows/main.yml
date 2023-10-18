@@ -32,4 +32,4 @@ jobs:
       run: ./spring/gradlew build
 
     - name: Test with Gradle
-      run: ./spring/gradlew test --tests "nl.fontys.youtubeyspringapi.*"
+      run: ./spring/gradlew test
