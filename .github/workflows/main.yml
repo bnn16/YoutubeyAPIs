@@ -26,9 +26,9 @@ jobs:
       run: ls -l
 
     - name: Build with Gradle
-      run: ./spring/gradlew build
+      run: ./gradlew build
       working-directory: ./spring
 
     - name: Test with Gradle
-      run: ./spring/gradlew test
+      run: ./gradlew test
       working-directory: ./spring
