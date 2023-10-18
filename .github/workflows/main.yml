@@ -25,11 +25,10 @@ jobs:
     - name: List directory contents
       run: ls -l
 
-    - name: Initialize Gradle Project
-      run: ./spring/gradlew init
-
     - name: Build with Gradle
       run: ./spring/gradlew build
+      working-directory: ./spring
 
     - name: Test with Gradle
       run: ./spring/gradlew test
+      working-directory: ./spring
