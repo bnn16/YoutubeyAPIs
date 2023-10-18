@@ -23,7 +23,7 @@ jobs:
         architecture: 'x64'
 
     - name: Build with Gradle
-      run: ./spring/gradlew build
+      run: ./YoutubeyAPIs/spring/gradlew build
 
     - name: Test with Gradle
-      run: ./spring/gradlew test --tests "nl.fontys.youtubeyspringapi.*"
+      run: ./YoutubeyAPIs/spring/gradlew test --tests "nl.fontys.youtubeyspringapi.*"
