@@ -23,7 +23,7 @@ jobs:
         architecture: 'x64'
 
     - name: Set the working directory to the Spring project
-      run: cd YoutubeyAPIs/spring
+      run: cd spring
 
     - name: Build with Gradle
       run: ./gradlew build
