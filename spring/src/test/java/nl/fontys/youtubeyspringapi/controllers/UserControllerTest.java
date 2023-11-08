@@ -1,13 +1,10 @@
 package nl.fontys.youtubeyspringapi.controllers;
 
-import nl.fontys.youtubeyspringapi.config.JwtGeneratorInterface;
-import nl.fontys.youtubeyspringapi.controllers.UserController;
+import nl.fontys.youtubeyspringapi.auth.JwtGeneratorInterface;
 import nl.fontys.youtubeyspringapi.document.User;
 import nl.fontys.youtubeyspringapi.document.UserInformation;
 import nl.fontys.youtubeyspringapi.document.requests.LoginReq;
-import nl.fontys.youtubeyspringapi.document.responds.LoginRes;
 import nl.fontys.youtubeyspringapi.services.CustomUserDetailsService;
-import nl.fontys.youtubeyspringapi.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

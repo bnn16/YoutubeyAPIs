@@ -1,4 +1,4 @@
-package nl.fontys.youtubeyspringapi.config;
+package nl.fontys.youtubeyspringapi.auth;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
