@@ -23,27 +23,26 @@ public class PostController {
     @PostMapping("")
     public ResponseEntity postPost(@RequestBody Post post) {
         try {
-            postService.savePost(post);
-            return new ResponseEntity(post, HttpStatus.CREATED);
+            if (!post.getDescription().isEmpty() && !post.getTitle().isEmpty() && post.getUserId() != null && post.getStatus() != null) {
+                postService.savePost(post);
+                return new ResponseEntity(post, HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity("Post field/s is empty", HttpStatus.CONFLICT);
+            }
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
     @GetMapping("/user/{userId}")
-    public List<Post> getPostsByUserId(@PathVariable String userId) throws EmptyPostListException {
-        List<Post> posts;
-        try {
-            posts = postService.getPostByUserId(userId);
-            if (posts.isEmpty()) {
-                throw new EmptyPostListException("No posts found for user with ID: " + userId);
-            }
-        } catch (EmptyPostListException e) {
-
-            throw new EmptyPostListException(e.getMessage());
+    public ResponseEntity<?> getPostsByUserId(@PathVariable String userId) {
+        List<Post> posts = postService.getPostByUserId(userId);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>("No posts found for user with ID: " + userId, HttpStatus.NOT_FOUND);
         }
-        return posts;
+        return new ResponseEntity<>(posts, HttpStatus.OK);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity getPostById(@PathVariable String id) {
