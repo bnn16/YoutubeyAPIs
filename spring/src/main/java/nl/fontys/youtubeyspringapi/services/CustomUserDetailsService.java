@@ -42,7 +42,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 
     public User saveUser(User user) {
-        return UserRepository.save(user);
+        User saved = UserRepository.save(user);
+        UserInformation userInfo = new UserInformation();
+        userInfo.setUserId(user.getId());
+        userInfo.setUsername(user.getUsername());
+        userInfo.setRole(user.getRole());
+        UserInfoRepository.save(userInfo);
+        return saved;
     }
 
     public User findByEmail(String email) {
@@ -69,9 +75,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
     }
     public void editById(String id, UserInformation updatedInfo) {
-        UserInformation userInfo = UserInfoRepository.findById(id).orElse(null);
+        UserInformation userInfo = UserInfoRepository.findByUserId(id);
+        User user = UserRepository.findById(id).orElse(null);
 
-        if (userInfo != null) {
+        if (userInfo != null && user != null){
             if(updatedInfo.getId() != null){
                 userInfo.setId(updatedInfo.getId());
             }
@@ -80,6 +87,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             }
             if (updatedInfo.getUsername() != null) {
                 userInfo.setUsername(updatedInfo.getUsername());
+                user.setUsername(updatedInfo.getUsername());
             }
 
             if (updatedInfo.getDescription() != null) {
@@ -88,11 +96,12 @@ public class CustomUserDetailsService implements UserDetailsService {
             if(updatedInfo.getYtLink() != null){
                 userInfo.setYtLink(updatedInfo.getYtLink());
             }
-            if(updatedInfo.getRole() != null){
+            if(updatedInfo.getRole() != null) {
                 userInfo.setRole(updatedInfo.getRole());
+                user.setRole(updatedInfo.getRole());
             }
-
             UserInfoRepository.save(userInfo);
+            UserRepository.save(user);
         }
        else{
             throw new IllegalArgumentException("User does not exist");

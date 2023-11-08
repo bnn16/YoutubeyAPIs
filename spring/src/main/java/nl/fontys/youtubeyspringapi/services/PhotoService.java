@@ -20,10 +20,15 @@ public class PhotoService {
         Photo photo = new Photo(title);
         photo.setImage(
                 new Binary(BsonBinarySubType.BINARY, file.getBytes()));
+        Photo existingPhoto = photoRepo.findByUserId(photo.getUserId());
+        if(existingPhoto != null){
+            photoRepo.delete(existingPhoto);
+        }
         photo = photoRepo.insert(photo); return photo.getUserId();
     }
 
     public Photo getPhoto(String id) {
         return photoRepo.findByUserId(id);
     }
+
 }

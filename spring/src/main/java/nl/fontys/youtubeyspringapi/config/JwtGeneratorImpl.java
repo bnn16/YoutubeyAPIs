@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class JwtGeneratorImpl implements JwtGeneratorInterface {
 
     //TODO: move to application.properties or .env, due to error with spring boot
+    // ask chung or jacco if later
 
     private final String secret = "8i//=BdX*:kicL!q1A+}Y?zM0DT&$EDr0wMt:0y'";
 
