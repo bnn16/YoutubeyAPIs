@@ -19,7 +19,7 @@ jacocoTestReport {
     }
 }
 
-sonar {
+sonarqube {
     properties {
         property "sonar.projectKey", "youtubey"
     }
