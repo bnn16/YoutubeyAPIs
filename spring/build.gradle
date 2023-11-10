@@ -62,3 +62,7 @@ tasks.named('test') {
     useJUnitPlatform()
     exclude '**/integration/**'
 }
+
+tasks.register('integrationTest', Test) {
+    useJUnitPlatform()
+}
