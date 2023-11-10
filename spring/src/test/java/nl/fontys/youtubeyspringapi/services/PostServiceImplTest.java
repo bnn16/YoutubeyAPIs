@@ -1,151 +1,169 @@
 package nl.fontys.youtubeyspringapi.services;
-
 import nl.fontys.youtubeyspringapi.document.Post;
 import nl.fontys.youtubeyspringapi.repositories.PostRepository;
-import nl.fontys.youtubeyspringapi.services.PostServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-public class PostServiceImplTest {
-
-    private PostServiceImpl postService;
+class PostServiceImplTest {
 
     @Mock
     private PostRepository postRepository;
 
+    @InjectMocks
+    private PostServiceImpl postService;
+
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        postService = new PostServiceImpl(postRepository);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testSavePost() {
+    void testSavePost() {
+        // Arrange
         Post post = new Post();
-        post.setTitle("Test Post");
-        post.setDescription("This is a test post");
-        post.setStatus("draft");
 
+        // Act
         postService.savePost(post);
 
+        // Assert
         verify(postRepository, times(1)).save(post);
     }
 
     @Test
-    public void testGetPostByUserId() {
+    void testGetPostByUserId() {
+        // Arrange
+        String userId = "123";
         List<Post> posts = new ArrayList<>();
-        Post post1 = new Post();
-        post1.setTitle("Test Post 1");
-        post1.setDescription("This is a test post 1");
-        post1.setStatus("draft");
-        post1.setUserId("user1");
-        posts.add(post1);
+        when(postRepository.findByUserId(userId)).thenReturn(posts);
 
-        Post post2 = new Post();
-        post2.setTitle("Test Post 2");
-        post2.setDescription("This is a test post 2");
-        post2.setStatus("published");
-        post2.setUserId("user1");
-        posts.add(post2);
+        // Act
+        List<Post> result = postService.getPostByUserId(userId);
 
-        when(postRepository.findByUserId("user1")).thenReturn(posts);
-
-        List<Post> result = postService.getPostByUserId("user1");
-
+        // Assert
+        assertNotNull(result);
         assertEquals(posts, result);
     }
 
     @Test
-    public void testGetPostById() {
+    void testGetPostById() {
+        // Arrange
+        String postId = "456";
         Post post = new Post();
-        post.setId("1");
-        post.setTitle("Test Post");
-        post.setDescription("This is a test post");
-        post.setStatus("draft");
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
-        when(postRepository.findById("1")).thenReturn(Optional.of(post));
+        // Act
+        Optional<Post> result = postService.getPostById(postId);
 
-        Optional<Post> result = postService.getPostById("1");
-
+        // Assert
+        assertTrue(result.isPresent());
         assertEquals(post, result.get());
     }
 
     @Test
-    public void testGetPostByIdNotFound() {
-        when(postRepository.findById(anyString())).thenReturn(Optional.empty());
+    void testGetPostById_PostNotFound() {
+        // Arrange
+        String postId = "nonexistentId";
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> postService.getPostById("1"));
+        // Act and Assert
+        assertThrows(IllegalArgumentException.class, () -> postService.getPostById(postId));
     }
 
     @Test
-    public void testDeletePostById() {
-        Post post = new Post();
-        post.setId("1");
-        post.setTitle("Test Post");
-        post.setDescription("This is a test post");
-        post.setStatus("draft");
+    void testDeletePostById() {
+        // Arrange
+        String postId = "789";
+        when(postRepository.findById(postId)).thenReturn(Optional.of(new Post()));
 
-        when(postRepository.findById("1")).thenReturn(Optional.of(post));
+        // Act
+        postService.deletePostById(postId);
 
-        postService.deletePostById("1");
-
-        verify(postRepository, times(1)).deleteById("1");
+        // Assert
+        verify(postRepository, times(1)).deleteById(postId);
     }
 
     @Test
-    public void testDeletePostByIdNotFound() {
-        when(postRepository.findById(anyString())).thenReturn(Optional.empty());
+    void testDeletePostById_PostNotFound() {
+        // Arrange
+        String postId = "nonexistentId";
+        when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> postService.deletePostById("1"));
+        // Act and Assert
+        assertThrows(IllegalArgumentException.class, () -> postService.deletePostById(postId));
     }
 
     @Test
-    public void testUpdatePostById() {
+    void testUpdatePostById() {
+        // Arrange
+        String postId = "101";
         Post existingPost = new Post();
-        existingPost.setId("1");
-        existingPost.setTitle("Test Post");
-        existingPost.setDescription("This is a test post");
-        existingPost.setStatus("draft");
+        existingPost.setId(postId);
+        existingPost.setTitle("Old Title");
+        existingPost.setDescription("Old Description");
+        existingPost.setStatus("Old Status");
 
         Post updatedPost = new Post();
-        updatedPost.setTitle("Updated Test Post");
-        updatedPost.setDescription("This is an updated test post");
-        updatedPost.setStatus("published");
+        updatedPost.setTitle("New Title");
+        updatedPost.setDescription("New Description");
+        updatedPost.setStatus("New Status");
 
-        when(postRepository.existsById("1")).thenReturn(true);
-        when(postRepository.findById("1")).thenReturn(Optional.of(existingPost));
+        when(postRepository.existsById(postId)).thenReturn(true);
+        when(postRepository.findById(postId)).thenReturn(Optional.of(existingPost));
 
-        postService.updatePostById("1", updatedPost);
+        // Act
+        postService.updatePostById(postId, updatedPost);
 
-        assertEquals(updatedPost.getTitle(), existingPost.getTitle());
-        assertEquals(updatedPost.getDescription(), existingPost.getDescription());
-        assertEquals(updatedPost.getStatus(), existingPost.getStatus());
-
+        // Assert
+        assertEquals("New Title", existingPost.getTitle());
+        assertEquals("New Description", existingPost.getDescription());
+        assertEquals("New Status", existingPost.getStatus());
         verify(postRepository, times(1)).save(existingPost);
     }
 
     @Test
-    public void testUpdatePostByIdNotFound() {
+    void testUpdatePostById_PostNotFound() {
+        // Arrange
+        String postId = "nonexistentId";
         Post updatedPost = new Post();
-        updatedPost.setTitle("Updated Test Post");
-        updatedPost.setDescription("This is an updated test post");
-        updatedPost.setStatus("published");
 
-        when(postRepository.existsById(anyString())).thenReturn(false);
+        when(postRepository.existsById(postId)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> postService.updatePostById("1", updatedPost));
+        // Act and Assert
+        assertThrows(IllegalArgumentException.class, () -> postService.updatePostById(postId, updatedPost));
+    }
+
+    @Test
+    void testUpdatePostById_NullUpdatedFields() {
+        // Arrange
+        String postId = "202";
+        Post existingPost = new Post();
+        existingPost.setId(postId);
+        existingPost.setTitle("Old Title");
+        existingPost.setDescription("Old Description");
+        existingPost.setStatus("Old Status");
+
+        Post updatedPost = new Post(); // no fields set
+
+        when(postRepository.existsById(postId)).thenReturn(true);
+        when(postRepository.findById(postId)).thenReturn(Optional.of(existingPost));
+
+        // Act
+        postService.updatePostById(postId, updatedPost);
+
+        // Assert
+        assertEquals("Old Title", existingPost.getTitle());
+        assertEquals("Old Description", existingPost.getDescription());
+        assertEquals("Old Status", existingPost.getStatus());
+        verify(postRepository, times(1)).save(existingPost);
     }
 }

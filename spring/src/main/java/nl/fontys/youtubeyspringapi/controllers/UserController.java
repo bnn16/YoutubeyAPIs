@@ -110,4 +110,15 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/profile/{id}")
+    public ResponseEntity deleteUserDetails(@PathVariable String id) {
+        try {
+            userService.deleteById(id);
+            return ResponseEntity.ok("User deleted");
+        } catch (Exception e) {
+            ErrorRes errorResponse = new ErrorRes(HttpStatus.BAD_REQUEST, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
 }

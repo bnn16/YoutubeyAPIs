@@ -19,12 +19,16 @@ import java.util.Optional;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository UserRepository;
+    private final UserRepository userRepository;
     private final UserInfoRepository UserInfoRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = UserRepository.findUserByEmail(email);
+        User user = userRepository.findUserByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
+
         List<String> roles = new ArrayList<>();
         roles.add("USER");
         UserDetails userDetails =
@@ -37,12 +41,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public User findUserByUsername(String username) {
-        return UserRepository.findUserByUsername(username);
+        return userRepository.findUserByUsername(username);
     }
 
 
     public User saveUser(User user) {
-        User saved = UserRepository.save(user);
+        User saved = userRepository.save(user);
         UserInformation userInfo = new UserInformation();
         userInfo.setUserId(user.getId());
         userInfo.setUsername(user.getUsername());
@@ -52,7 +56,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public User findByEmail(String email) {
-        return UserRepository.findUserByEmail(email);
+        return userRepository.findUserByEmail(email);
     }
 
     public UserInformation findByUserId(String id) {
@@ -76,7 +80,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
     public void editById(String id, UserInformation updatedInfo) {
         UserInformation userInfo = UserInfoRepository.findByUserId(id);
-        User user = UserRepository.findById(id).orElse(null);
+        User user = userRepository.findById(id).orElse(null);
 
         if (userInfo != null && user != null){
             if(updatedInfo.getId() != null){
@@ -101,9 +105,20 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.setRole(updatedInfo.getRole());
             }
             UserInfoRepository.save(userInfo);
-            UserRepository.save(user);
+            userRepository.save(user);
         }
        else{
+            throw new IllegalArgumentException("User does not exist");
+        }
+    }
+    public void deleteById(String id) {
+        UserInformation userInfo = UserInfoRepository.findByUserId(id);
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null && userInfo != null){
+            UserInfoRepository.delete(userInfo);
+            userRepository.delete(user);
+        }
+        else{
             throw new IllegalArgumentException("User does not exist");
         }
     }
