@@ -1,4 +1,4 @@
-name: Java Spring Gradle CI
+name: Java Spring Gradle CI with SonarQube
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build, Test, and Analyze Code Quality
     runs-on: ubuntu-latest
 
     steps:
@@ -35,36 +35,13 @@ jobs:
           ./gradlew jacocoTestReport
         working-directory: ./spring
 
-  build_with_jdk17:
-    name: Sonar
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Set up JDK 17
-        uses: actions/setup-java@v1
-        with:
-          java-version: 17
-      - name: Cache SonarQube packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-          
-      - name: Cache Gradle packages
-        uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
-          working-directory: ./spring
-          
-      - name: Build and analyze
+      - name: SonarQube Scan
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          run: |
-            ./gradlew build sonar --info || true
-        working-directory: ./spring
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Ensure you've set the SONAR_TOKEN in your repository secrets
+        run: |
+          # Execute SonarQube analysis
+          sonar-scanner \
+            -Dsonar.projectKey=youtubey \
+            -Dsonar.sources=src \
+            -Dsonar.host.url=http://localhost:9000 \
+            -Dsonar.login=$SONAR_TOKEN
