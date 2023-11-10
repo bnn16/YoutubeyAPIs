@@ -26,7 +26,7 @@ jobs:
         run: ls -l
 
       - name: Build and Analyze with SonarQube
-        run: ./gradlew build sonarqube -Dsonar.projectKey=youtubey -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
+        run: ./gradlew build sonar -Dsonar.projectKey=youtubey -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
         working-directory: ./spring
 
         env:
