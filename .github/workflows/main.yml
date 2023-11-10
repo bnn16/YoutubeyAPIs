@@ -25,23 +25,9 @@ jobs:
       - name: List directory contents
         run: ls -l
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Build and Analyze with SonarQube
+        run: ./gradlew build sonarqube -Dsonar.projectKey=youtubey -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
         working-directory: ./spring
 
-      - name: Test with Gradle
-        run: |
-          ./gradlew test
-          ./gradlew jacocoTestReport
-        working-directory: ./spring
-
-      - name: SonarQube Scan
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Ensure you've set the SONAR_TOKEN in your repository secrets
-        run: |
-          # Execute SonarQube analysis
-          sonar-scanner \
-            -Dsonar.projectKey=youtubey \
-            -Dsonar.sources=src \
-            -Dsonar.host.url=http://localhost:9000 \
-            -Dsonar.login=$SONAR_TOKEN
+          SONAR_TOKEN: sqp_cd96491f1f2c42fc293375f20b2f805caf30ddfb
