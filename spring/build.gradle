@@ -42,7 +42,7 @@ dependencies {
     // Spring Security Test
     testImplementation 'org.springframework.security:spring-security-test'
 
-    // JUnit for testing
+    //JUnit for testing
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
 
@@ -58,24 +58,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-sourceSets {
-    integrationTest {
-        java.srcDirs = ['src/test/java/nl/fontys/youtubeyspringapi/controllers']
-        resources.srcDirs = ['src/test/resources']
-    }
-}
-
-configurations {
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-}
-
-task integrationTest(type: Test) {
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-}
-
 tasks.named('test') {
     useJUnitPlatform()
-    exclude '**/*IntegrationTest*'
+    exclude '**/integration/**'
 }
