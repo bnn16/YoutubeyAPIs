@@ -76,4 +76,5 @@ jobs:
 
       - name: SonarQube Analysis with Gradle
         run: ./gradlew sonar "-Dsonar.host.url=http://localhost:9000/" "-Dsonar.login=squ_8e452817b63d478b89509ce57a913e794d0db904"
+        working-directory: ./spring
         continue-on-error: true
