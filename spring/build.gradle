@@ -22,8 +22,8 @@ jacocoTestReport {
 sonarqube {
     properties {
         property "sonar.host.url", "http://localhost:9000"
-        property "sonar.token", "squ_0e14fa1ecfa491c6fa55feb061b76dbcf8f77aeb"
         property "sonar.projectName", "youtubeyyyy"
+        property "sonar.projectKey", "youtubey"
         property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/customJacocoReportDir/test/jacocoTestReport.xml"
     }
 }

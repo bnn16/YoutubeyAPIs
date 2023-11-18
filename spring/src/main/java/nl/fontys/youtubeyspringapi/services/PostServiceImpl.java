@@ -60,6 +60,9 @@ public class PostServiceImpl implements PostService {
             if (updatedPost.getTitle() != null) {
                 existingPost.setTitle(updatedPost.getTitle());
             }
+            if(updatedPost.getPublic_url() != null){
+                existingPost.setPublic_url(updatedPost.getPublic_url());
+            }
 
             if (updatedPost.getDescription() != null) {
                 existingPost.setDescription(updatedPost.getDescription());

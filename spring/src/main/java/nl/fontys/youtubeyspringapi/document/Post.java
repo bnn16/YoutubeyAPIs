@@ -15,4 +15,6 @@ public class Post {
     private String description;
     private String userId;
     private String status;
+    private String link;
+    private String public_url;
 }
