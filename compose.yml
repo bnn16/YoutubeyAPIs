@@ -1,6 +1,7 @@
 version: '3'
 services:
   spring-app:
+    image: "bnn16/youtubeyy:spring-app"
     build:
       context: ./spring
       dockerfile: Dockerfile
@@ -12,6 +13,7 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb+srv://bogdannikolov4:3AKDXbFP5WTasixQ@cluster0.xs1ecco.mongodb.net/
 
   python-app:
+    image: "bnn16/youtubeyy:python-app"
     build:
       context: ./python
       dockerfile: Dockerfile
