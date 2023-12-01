@@ -8,9 +8,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -165,5 +167,68 @@ class PostServiceImplTest {
         assertEquals("Old Description", existingPost.getDescription());
         assertEquals("Old Status", existingPost.getStatus());
         verify(postRepository, times(1)).save(existingPost);
+    }
+
+    @Test
+    void testGetAllPostsWhereStatusIsCreated() {
+        // Mock data
+        Post post1 = new Post();
+        post1.setStatus("Created");
+        Post post2 = new Post();
+        post2.setStatus("Created");
+        Post post3 = new Post();
+        post3.setStatus("Published");
+
+        List<Post> allPosts = new ArrayList<>();
+        allPosts.add(post1);
+        allPosts.add(post2);
+
+        when(postRepository.findAllByStatus("Created")).thenReturn(allPosts);
+
+        List<Post> createdPosts = postService.getAllPostsWhereStatusIsCreated();
+
+        // Verify the result
+        assertEquals(2, createdPosts.size()); // Assuming only 2 posts have 'Created' status
+    }
+
+    @Test
+    void testUpdatePostById2() {
+        // Mock data
+        String postId = "exampleId";
+        Post existingPost = new Post();
+        existingPost.setId(postId);
+        existingPost.setTitle("Existing Title");
+        existingPost.setDescription("Existing Description");
+        existingPost.setEditedVideo("Existing Edited Video");
+        existingPost.setPublic_url("Existing Public URL");
+        existingPost.setEditorId("Existing Editor ID");
+        existingPost.setStatus("Existing Status");
+
+        Post updatedPost = new Post();
+        updatedPost.setTitle("Updated Title");
+        updatedPost.setDescription("Updated Description");
+        updatedPost.setEditedVideo("Updated Edited Video");
+        updatedPost.setPublic_url("Updated Public URL");
+        updatedPost.setEditorId("Updated Editor ID");
+        updatedPost.setStatus("Updated Status");
+
+        // Mock behavior of postRepository
+        when(postRepository.existsById(postId)).thenReturn(true);
+        when(postRepository.findById(postId)).thenReturn(Optional.of(existingPost));
+
+        // Call the service method
+        postService.updatePostById(postId, updatedPost);
+
+        // Verify that postRepository.save() was called with the updated post
+        verify(postRepository).save(existingPost);
+
+        // Verify that the existing post fields were updated
+        assertEquals("Updated Title", existingPost.getTitle());
+        assertEquals("Updated Description", existingPost.getDescription());
+        assertEquals("Updated Edited Video", existingPost.getEditedVideo());
+        assertEquals("Updated Public URL", existingPost.getPublic_url());
+        assertEquals("Updated Editor ID", existingPost.getEditorId());
+        assertEquals("Updated Status", existingPost.getStatus());
+        // ... other assertions for the fields being updated
     }
 }

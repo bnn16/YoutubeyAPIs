@@ -43,6 +43,24 @@ public class PostController {
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
+    @GetMapping("/editor/{editorId}")
+    public ResponseEntity<?> getPostsByEditorId(@PathVariable String editorId) {
+        List<Post> posts = postService.getPostByEditorId(editorId);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>("No posts found for editor with ID: " + editorId, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(posts, HttpStatus.OK);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getAllPosts() {
+        List<Post> posts = postService.getAllPostsWhereStatusIsCreated();
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>("No posts found", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(posts, HttpStatus.OK);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity getPostById(@PathVariable String id) {

@@ -17,4 +17,6 @@ public class Post {
     private String status;
     private String link;
     private String public_url;
+    private String editorId;
+    private String editedVideo;
 }

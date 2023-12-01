@@ -1,10 +1,17 @@
 from firebase_admin import credentials, initialize_app, storage
 from typing import BinaryIO, List
-from models import UploadResponse, BlobResponse
+import os
+
 
 class StorageService:
     def __init__(self):
-        cred = credentials.Certificate("serviceAccountKey.json")
+        # Get the path to the service account key file
+        service_account_key_path = os.path.join(
+            os.path.dirname(__file__), "serviceAccountKey.json"
+        )
+
+        # Initialize Firebase
+        cred = credentials.Certificate(service_account_key_path)
         initialize_app(cred, {"storageBucket": "yy-f284e.appspot.com"})
         self.client = storage.bucket()
 

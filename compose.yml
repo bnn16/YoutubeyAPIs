@@ -1,0 +1,27 @@
+version: '3'
+services:
+  spring-app:
+    build:
+      context: ./spring
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb+srv://bogdannikolov4:3AKDXbFP5WTasixQ@cluster0.xs1ecco.mongodb.net/
+
+  python-app:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0
+    ports:
+      - "8000:8000"
+  
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: Youtubey

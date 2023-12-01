@@ -19,6 +19,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<Post> getAllPostsWhereStatusIsCreated() {
+        return postRepository.findAllByStatus("Created");
+    }
+    @Override
     public void savePost(Post post) {
         postRepository.save(post);
     }
@@ -36,6 +40,11 @@ public class PostServiceImpl implements PostService {
             return post;
         }
         throw new IllegalArgumentException("Post does not exist");
+    }
+
+    @Override
+    public List<Post> getPostByEditorId(String editorId) {
+        return postRepository.findByEditorId(editorId);
     }
 
     @Override
@@ -57,6 +66,12 @@ public class PostServiceImpl implements PostService {
         Post existingPost = postRepository.findById(id).orElse(null);
 
         if (existingPost != null) {
+            if(updatedPost.getEditedVideo() != null){
+                existingPost.setEditedVideo(updatedPost.getEditedVideo());
+            }
+            if(updatedPost.getEditorId() != null){
+                existingPost.setEditorId(updatedPost.getEditorId());
+            }
             if (updatedPost.getTitle() != null) {
                 existingPost.setTitle(updatedPost.getTitle());
             }

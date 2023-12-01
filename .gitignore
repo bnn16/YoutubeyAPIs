@@ -172,3 +172,5 @@ dist
 .pnp.*
 serviceAccountKey.json
 python/firebase_config.json
+
+python/.venv

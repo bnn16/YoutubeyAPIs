@@ -222,6 +222,62 @@ class CustomUserDetailsServiceTest {
         assertEquals("newUsername", existingUser.getUsername());
         assertEquals("NEW_ROLE", existingUser.getRole());
     }
+    @Test
+    void loadUserByUsername_UserFound_ReturnsUserDetails() {
+        // Mocking
+        User user = new User();
+        user.setEmail("test@example.com");
+        user.setPassword("password");
+
+        when(userRepository.findUserByEmail(anyString())).thenReturn(user);
+
+        // Test
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername("test@example.com");
+
+        assertNotNull(userDetails);
+        assertEquals("test@example.com", userDetails.getUsername());
+        assertEquals("password", userDetails.getPassword());
+
+        verify(userRepository, times(1)).findUserByEmail(anyString());
+    }
+
+    @Test
+    void editById_UserAndUserInfoExist_UpdatesUserInfoAndUser() {
+        // Mocking
+        UserInformation userInfo = new UserInformation();
+        userInfo.setUserId("123");
+        User user = new User();
+        user.setId("123");
+
+        when(userInfoRepository.findByUserId(anyString())).thenReturn(userInfo);
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+
+        // Test
+        UserInformation updatedInfo = new UserInformation();
+        updatedInfo.setId("456");
+        updatedInfo.setLocation("New Location");
+        updatedInfo.setUsername("newUsername");
+        updatedInfo.setDescription("New Description");
+        updatedInfo.setYtLink("New YT Link");
+        updatedInfo.setRole("ADMIN");
+
+        customUserDetailsService.editById("123", updatedInfo);
+
+        assertEquals("456", userInfo.getId());
+        assertEquals("New Location", userInfo.getLocation());
+        assertEquals("newUsername", userInfo.getUsername());
+        assertEquals("New Description", userInfo.getDescription());
+        assertEquals("New YT Link", userInfo.getYtLink());
+        assertEquals("ADMIN", userInfo.getRole());
+
+        assertEquals("newUsername", user.getUsername());
+        assertEquals("ADMIN", user.getRole());
+
+        verify(userInfoRepository, times(1)).findByUserId(anyString());
+        verify(userRepository, times(1)).findById(anyString());
+        verify(userInfoRepository, times(1)).save(userInfo);
+        verify(userRepository, times(1)).save(user);
+    }
 
     @Test
     void testEditById_UserNotFound() {
@@ -234,6 +290,41 @@ class CustomUserDetailsServiceTest {
 
         // Act and Assert
         assertThrows(IllegalArgumentException.class, () -> customUserDetailsService.editById(userId, updatedInfo));
+    }
+
+    @Test
+    void deleteById_UserAndUserInfoExist_DeletesUserAndUserInfo() {
+        // Mocking
+        UserInformation userInfo = new UserInformation();
+        userInfo.setUserId("123");
+        User user = new User();
+        user.setId("123");
+
+        when(userInfoRepository.findByUserId(anyString())).thenReturn(userInfo);
+        when(userRepository.findById(anyString())).thenReturn(Optional.of(user));
+
+        // Test
+        customUserDetailsService.deleteById("123");
+
+        verify(userInfoRepository, times(1)).findByUserId(anyString());
+        verify(userRepository, times(1)).findById(anyString());
+        verify(userInfoRepository, times(1)).delete(userInfo);
+        verify(userRepository, times(1)).delete(user);
+    }
+
+    @Test
+    void deleteById_UserOrUserInfoNotExist_ThrowsIllegalArgumentException() {
+        // Mocking
+        when(userInfoRepository.findByUserId(anyString())).thenReturn(null);
+        when(userRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        // Test and assertion
+        assertThrows(IllegalArgumentException.class, () -> customUserDetailsService.deleteById("123"));
+
+        verify(userInfoRepository, times(1)).findByUserId(anyString());
+        verify(userRepository, times(1)).findById(anyString());
+        verify(userInfoRepository, never()).delete(any());
+        verify(userRepository, never()).delete(any());
     }
 
 }

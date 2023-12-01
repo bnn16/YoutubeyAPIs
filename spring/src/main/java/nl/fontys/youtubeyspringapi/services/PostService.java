@@ -10,8 +10,9 @@ import java.util.Optional;
 public interface PostService {
     void savePost(Post post);
 
-    //no getAllPosts() because it's unrealistic for a user to have access to all the posts in the database
+    List<Post> getAllPostsWhereStatusIsCreated();
     List<Post> getPostByUserId(String userId);
+    List<Post> getPostByEditorId(String editorId);
 
     Optional<Post> getPostById(String id);
 
