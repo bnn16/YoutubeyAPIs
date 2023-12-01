@@ -1,4 +1,4 @@
-name: Java Spring Gradle CI with SonarQube
+name: CI/CD pipeline
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build, Test, and Analyze Code Quality
+    name: Build, Test, and Analyze Code Quality, Docker, Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -37,7 +37,7 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Docker Login
-        run: docker login -u bnn16
+        run: docker login -u bnn16 -p ${{ secrets.DOCKER_PASSWORD }}
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
