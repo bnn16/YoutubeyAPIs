@@ -24,10 +24,13 @@ jobs:
 
       - name: List directory contents
         run: ls -l
-
-      - name: Gradlew Build
-        run: .gradlew build
-        working-directory: ./spring
+        
+      - name: Checkout project sources
+        uses: actions/checkout@v3
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run build with Gradle Wrapper
+        run: ./gradlew build
 
       - name: List directory contents bin
         run: ls spring/build/libs/
