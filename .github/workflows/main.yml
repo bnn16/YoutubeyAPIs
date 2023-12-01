@@ -60,3 +60,11 @@ jobs:
         run: docker-compose push
         working-directory: ./
 
+      #final step is to push to azure/aws or other hosting service. Here is how it works.
+      #- name: Deploy to Azure App Service
+        #uses: azure/webapps-deploy@v2
+        #with:
+          #app-name: <AZURE_APP_NAME>
+          #images: '<ACR_NAME>.azurecr.io/<REPOSITORY>:<TAG>'
+        #env:
+          #AZURE_LOGIN: ${{ secrets.AZURE_CREDENTIALS }}
