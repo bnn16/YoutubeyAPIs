@@ -24,6 +24,11 @@ jobs:
 
       - name: List directory contents
         run: ls -l
+
+      - name: Gradlew Build
+        run: .gradlew build
+        working-directory: ./spring
+
       - name: List directory contents bin
         run: ls spring/build/libs/
 
