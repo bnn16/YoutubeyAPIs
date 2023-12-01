@@ -25,9 +25,27 @@ jobs:
       - name: List directory contents
         run: ls -l
 
-      - name: Build and Analyze with SonarQube
-        run: ./gradlew build sonar -Dsonar.projectKey=youtubey -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
-        working-directory: ./spring
+      # commenting this out, due to not having a sonarqube host instance, to send the answer http://localhost:9000 doesn't work, 
+      #student desk refused to pay to host the sonarqube
+    #  - name: Build and Analyze with SonarQube
+     #   run: ./gradlew build sonar -Dsonar.projectKey=youtubey -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
+      #  working-directory: ./spring
 
+       # env:
+        #  SONAR_TOKEN: sqp_cd96491f1f2c42fc293375f20b2f805caf30ddfb
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Docker Login
+        run: docker login -u bnn16
         env:
-          SONAR_TOKEN: sqp_cd96491f1f2c42fc293375f20b2f805caf30ddfb
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Images
+        run: docker-compose build
+        working-directory: ./
+
+      - name: Push Docker Images
+        run: docker-compose push
+        working-directory: ./
+
