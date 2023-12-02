@@ -1,4 +1,4 @@
-name: Java Spring Gradle CI with SonarQube
+name: CI/CD pipeline
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build, Test, and Analyze Code Quality
+    name: Build, Test, and Analyze Code Quality, Docker, Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -24,10 +24,47 @@ jobs:
 
       - name: List directory contents
         run: ls -l
-
-      - name: Build and Analyze with SonarQube
-        run: ./gradlew build sonar -Dsonar.projectKey=youtubey -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
+        
+      - name: Checkout project sources
+        uses: actions/checkout@v3
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run build with Gradle Wrapper
+        run: ./gradlew build
         working-directory: ./spring
 
+      - name: List directory contents bin
+        run: ls spring/build/libs/
+
+      # commenting this out, due to not having a sonarqube host instance, to send the answer http://localhost:9000 doesn't work, 
+      #student desk refused to pay to host the sonarqube
+    #  - name: Build and Analyze with SonarQube
+     #   run: ./gradlew build sonar -Dsonar.projectKey=youtubey -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
+      #  working-directory: ./spring
+
+       # env:
+        #  SONAR_TOKEN: sqp_cd96491f1f2c42fc293375f20b2f805caf30ddfb
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Docker Login
+        run: docker login -u bnn16 -p ${{ secrets.DOCKER_PASSWORD }}
         env:
-          SONAR_TOKEN: sqp_cd96491f1f2c42fc293375f20b2f805caf30ddfb
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Images
+        run: docker-compose build
+        working-directory: ./
+
+      - name: Push Docker Images
+        run: docker-compose push
+        working-directory: ./
+
+      #final step is to push to azure/aws or other hosting service. Here is how it works.
+      #- name: Deploy to Azure App Service
+        #uses: azure/webapps-deploy@v2
+        #with:
+          #app-name: <AZURE_APP_NAME>
+          #images: '<ACR_NAME>.azurecr.io/<REPOSITORY>:<TAG>'
+        #env:
+          #AZURE_LOGIN: ${{ secrets.AZURE_CREDENTIALS }}
