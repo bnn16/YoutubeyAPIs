@@ -173,4 +173,6 @@ dist
 serviceAccountKey.json
 python/firebase_config.json
 
+node/node_modules
+node/package-lock.json
 python/.venv

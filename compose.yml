@@ -20,6 +20,13 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0
     ports:
       - "8000:8000"
+  node-app:
+    image: "bnn16/youtubeyy:node-app"
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
   
   mongodb:
     image: mongo:latest
